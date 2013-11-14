@@ -1,4 +1,4 @@
-/*Simple Database prolog based */
+/* Database in prolog*/
 
 Domains
     tipo_nome, tipo_tel = string.
