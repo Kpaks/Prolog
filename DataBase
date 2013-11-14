@@ -1,0 +1,384 @@
+/*Simple Database prolog based */
+
+Domains
+    tipo_nome, tipo_tel = string.
+    tipo_codL, tipo_qte, tipo_codC = integer.
+    lista, lista2 = integer*.
+    	
+    
+Database
+	cliente(integer, tipo_nome, tipo_tel).
+    livro(tipo_codL, tipo_nome, tipo_qte).
+    emprestimo(integer, lista).
+	relatorio(integer,tipo_codL).
+    
+Predicates
+    menuAux (integer).     /* menu principal.*/
+    menu (integer).        /* menus auxiliares.*/
+    processa (integer).    /* processa clientes. */
+    processaL(integer).    /* processa livros. */
+	processaE(integer).    /* processa emprestimos. */
+    analiseAl(integer).    /* analisa emprest. */
+	analisaR(lista).	   /* analisa relatorio cliente */
+	analisaRe(lista2).	   /* analisa relatorio livro */
+	adicionaL.			   /* adiciona novo livro  */
+    adiciona.              /* adiciona novo cliente  */
+    deletaL.			   /* deleta livro  */
+    deleta.                /* deleta cliente  */
+	alugar.				   /* aluga livro  */
+	devolver.			   /* devolve livro  */
+    procura.               /* procura cliente */
+    procuraL.			   /* procura livro */
+	histoC. 			   /* historico cliente */
+	histoA(lista). 		   /* historico cliente */
+	histoAA(lista).		   /* mostra livros alugados */
+	relatC.				   /* relatorio cliente */
+	relatL.				   /* relatorio livro */
+    salva.                 /* salva em um arquivo. */
+	erro.                  /* processa erro na escolha da opcao do menu. */
+    erroAux.		 	   /* processa erro na escolha da opcao do menu. */
+	erroL.   		       /* processa erro na escolha da opcao do menu. */
+	erroE.				   /* processa erro na escolha da opcao do menu. */
+	concatena(lista,lista,lista).      /*processa concatenacao*/
+	retira(lista,tipo_codL,lista).     /*processa retirada*/
+	analiseRR(integer,tipo_codL).      /*analise livro*/	
+	procedure(integer).				   /*procedure cliente*/		
+	procedure2(integer).			   /*procedure livro*/
+	proC(lista2,integer).			   /*ordenacao cliente*/
+	proC2(lista2,integer).			   /*ordenacao livro*/	
+	procR(integer).					   /*processa retirada*/	
+	procRR(lista).					   /*processa retirada*/
+	intercala(lista2,lista2,lista2).   /*ordenacao cliente*/
+	distribui(lista2,lista2,lista2).   /*ordenacao cliente*/
+	ordena(lista2,lista2).             /*ordenacao cliente*/
+	intercala2(lista2,lista2,lista2).  /*ordenacao livro*/
+	distribui2(lista2,lista2,lista2).  /*ordenacao livro*/
+	ordena2(lista2,lista2).            /*ordenacao livro*/
+
+Clauses
+	/* Clausulas de menu. */
+    menuAux(_):- nl,
+				write("Escolha uma opcao:"),nl,
+				write("1. Clientes"), nl,
+				write("2. Livros"), nl,
+				write("3. Emprestimos"), nl,
+				write("4. Salvar"), nl,
+				write("5. Sair"), nl,
+				readint(EscolhaAux),
+				menu(EscolhaAux). 
+
+	menu(1):-   nl,
+			    write("Escolha uma opcao: "), nl,
+			    write("1. Adiciona um Cliente"), nl,
+			    write("2. Deleta um Cliente "), nl,
+			    write("3. Procura um Cliente "), nl,
+			    write(" "),nl,
+			    readint(Escolha),
+			    processa (Escolha), menuAux(Escolha).
+
+    menu(2):-   nl,
+    	        write("Escolha uma opcao: "), nl,
+    	        write("1. Adiciona um Livro "), nl,
+    	        write("2. Deleta um Livro"), nl,
+    	        write("3. Procura um Livro"), nl,
+    	        write(" "), nl,
+    	        readint(Escolha),
+    	        processaL(Escolha),menuAux(Escolha).
+    
+    menu(3):-   nl,
+			    write("Escolha uma opcao: "), nl,
+			    write("1. Alugar Livro"), nl,
+			    write("2. Devolver Livro"), nl,
+			    write("3. Livros alugados"), nl,
+				write("4. Relatorio Cliente"), nl,
+				write("5. Relatorio Livro"), nl,
+			    readint(Escolha),
+			    processaE(Escolha),menuAux(Escolha).
+                
+	menu(4):-  salva, menuAux(0).
+	
+	menu(5):-  write ("Deseja Sair? (s/n)"), readln(Resposta), 
+			   frontchar (Resposta,'s',_).	  
+
+	menu(5):- menuAux(0).
+	
+	/* processa entradas invalidas */		   
+    menu(EscolhaAux):- EscolhaAux < 0, erroAux.
+    menu(EscolhaAux):- EscolhaAux > 5, erroAux.
+
+	erroAux:- write("Por favor, apenas numeros entre 1 e 5"),
+    	      nl,
+    	      write("Tecle algo para continuar"),
+    	      readchar(_),
+    	      menuAux(1).
+			  
+	/* Clausulas que processam a escolha para Cliente. */
+    processa (1) :- adiciona.
+    processa (2) :- deleta.
+    processa (3) :- procura.
+
+    /* processa entradas invalidas */
+    processa (Escolha) :- Escolha < 1, erro.
+    processa (Escolha) :- Escolha > 3, erro.
+
+    erro :- write ("Por favor entre numeros entre 1 e 3."),
+            nl,
+            write ("Tecle algo para continuar."),
+            readchar (_).
+   
+    /* processamento Livros */
+    processaL (1):- adicionaL.
+    processaL (2):- deletaL.
+    processaL (3):- procuraL.
+    
+	/* processa entradas invalidas */
+    processaL (Escolha) :- Escolha < 1, erroL.
+    processaL (Escolha) :- Escolha > 3, erroL.
+
+    erroL :-  write ("Por favor entre numeros entre 1 e 3."),
+              nl,
+              write ("Tecle algo para continuar."),
+              readchar (_).	
+    
+	/*processamento Emprestimos*/
+	processaE (1):- alugar.
+	processaE (2):- devolver.
+	processaE (3):- histoC.
+	processaE (4):- relatC.
+	processaE (5):-	relatL.
+	
+	/* processa entradas invalidas */
+    processaE (Escolha) :- Escolha < 1, erroE.
+    processaE (Escolha) :- Escolha > 5, erroE.
+
+    erroE :- write ("Por favor entre numeros entre 1 e 5."),
+             nl,
+             write ("Tecle algo para continuar."),
+             readchar (_).	
+	
+	/* Clausula que trata a concatenacao. */
+ 	concatena([],L,L).
+	concatena([N|L1],L2,[N|L3]) :- concatena(L1,L2,L3).	    
+
+    /* Clausulas que implementam as rotinas de manipulacao do DB.*/
+
+    /* Adiciona um cliente */
+	adiciona :- write ("Adicionando um Cliente ao B D."), nl,
+				write ("Entre o nome: "), readln (Nome), procedure(CH),
+				write("Digite telefone:"), readln(Tel),
+				assertz (cliente (CH, Nome, Tel)),
+				assertz (emprestimo (CH,[])),
+				write ("Cliente adicionado ao B D."), nl.
+	
+	procedure(CH) :- findall(CC,cliente(CC,_,_),L), ordena(L,S), proC(S,CH).
+	  
+	ordena([],[]). 
+	ordena([X],[X]). 
+	ordena([X,Y|Z],S) :-  
+    distribui([X,Y|Z],A,B), 
+    ordena(A,As), 
+    ordena(B,Bs), 
+    intercala(As,Bs,S). 
+	
+	distribui([],[],[]). 
+	distribui([X],[X],[]). 
+	distribui([X,Y|Z],[X|A],[Y|B]) :- distribui(Z,A,B).
+	
+	intercala([],B,B). 
+	intercala(A,[],A). 
+	intercala([X|A],[Y|B],[X|C]) :- 
+    X < Y, 
+    intercala(A,[Y|B],C). 
+	intercala([X|A],[Y|B],[Y|C]) :- 
+    X > Y,  
+    intercala([X|A],B,C).
+	
+	/* gera chave*/
+	proC([],01) :- !.
+	proC([Cab1,Cab2|Cau],CH) :- Cab2 = Cab1 + 1, proC([Cab2|Cau],CH).
+	proC([Cab|_],CH) :- CH = Cab + 1.					  	
+	
+				
+    /* Adiciona um livro */  
+	/* Se livro estiver com Qte zero, digita-se o cod. */
+    /* Para novo livro, digita-se qualquer coisa. */	
+	adicionaL :- write ("Adicionando um Livro ao B D."), nl,
+				 write ("Para livro em qte zero, digite codigo"), nl,
+				 write ("Para livro novo, digite qualquer coisa:"), nl, readint(Codigo),
+				 livro(Codigo,_,0), retract(livro(Codigo,_,_)),
+				 write("Entre o nome: "), readln(Nome),
+				 write("Entre com a qte: "), readint(Qte),
+				 assertz(livro(Codigo,Nome,Qte)),
+				 write("Livro adicionado."), nl.
+	
+    adicionaL :- write ("Adicionando livro: "), nl,
+				 write ("Entre nome do Livro: "), readln (Nome), procedure2(CH),
+				 write("Digite quantidade:"), readint(Qte),
+				 assertz (livro (CH, Nome, Qte)),
+				 write ("Livro adicionado ao B D."), nl.
+	
+	procedure2(CH) :- findall(CL,livro(CL,_,_),L), ordena2(L,S), proC2(S,CH).
+	  
+	ordena2([],[]). 
+	ordena2([X],[X]). 
+	ordena2([X,Y|Z],S) :-  
+    distribui2([X,Y|Z],A,B), 
+    ordena2(A,As), 
+    ordena2(B,Bs), 
+    intercala2(As,Bs,S). 
+	
+	distribui2([],[],[]). 
+	distribui2([X],[X],[]). 
+	distribui2([X,Y|Z],[X|A],[Y|B]) :- distribui2(Z,A,B).
+	
+	intercala2([],B,B). 
+	intercala2(A,[],A). 
+	intercala2([X|A],[Y|B],[X|C]) :- 
+    X < Y, 
+    intercala2(A,[Y|B],C). 
+	intercala2([X|A],[Y|B],[Y|C]) :- 
+    X > Y,  
+    intercala2([X|A],B,C).
+	
+	/* gera chave*/
+	proC2([],01) :- !.
+	proC2([Cab1,Cab2|Cau],CH) :- Cab2 = Cab1 + 1, proC2([Cab2|Cau],CH).
+	proC2([Cab|_],CH) :- CH = Cab + 1.
+				 
+	
+    /* Aluga um livro */	
+	alugar :-   write("Entre com o codigo do cliente: "), readint (CC), nl,
+                write("Entre com o codigo do livro: "), readint (CL), nl,
+                cliente(CC,_,_), livro(CL,NL,QL), QL>=1,analiseAl(CC), emprestimo(CC,L),  QLL = QL-1, 
+                assertz(livro(CL,NL,QLL)), retract(livro(CL,NL,QL)), 
+				concatena([CL],L,LF), analiseRR(CC,CL), assertz(relatorio(CC,CL)), 
+                assertz(emprestimo(CC,LF)), retract(emprestimo(CC,L)),write("Livro Alugado").
+
+	alugar:-    write("Livro esgotado!!!"), nl.			
+	
+	analiseAl(CC) :-	emprestimo(CC,_), write("processando..."), nl.		
+	analiseAl(CC) :-	assertz(emprestimo(CC,[])), write("processando..."), nl.
+
+	analiseRR(CC,CL) :-   relatorio(CC,CL), retract(relatorio(CC,CL)).
+	analiseRR(_,_) :-   nl.
+	
+	
+	/* Devolve um livro */
+	devolver :-  write("Analise do Cliente:"), nl,
+				 write("Digite codigo do cliente: "),nl, readint(CC),
+				 emprestimo(CC,[]),write("Nao ha livros alugados").
+	
+	
+	devolver :- write("Digite novamente codigo do cliente: "),nl, readint(CC),
+				emprestimo(CC,L), write("Livros alugados: "), nl,  
+				histoAA(L),
+				write("Digite codigo do livro a ser devolvido: "), nl, readint(CL),
+				emprestimo(CC,L), livro(CL,NL,QL), retira(L,CL,L2), 
+				assertz(emprestimo(CC,L2)), 
+				retract(emprestimo(CC,L)), QLL = QL + 1, 
+				assertz(livro(CL,NL,QLL)), 
+				retract(livro(CL,NL,QL)), 
+				write("Tarefa processada").
+									
+	devolver :- write("Livro nao existente"), nl.
+	
+	histoAA ([]) :- nl.
+	histoAA ([Cab|Cau]) :- livro(Cab,Nome,_), write("Cod: ",Cab ," - Nome: ", Nome), nl,
+						   histoAA(Cau).
+	
+	retira ([CL|L2],CL,L2):-!.
+	retira ([Cab|Cauda],CL,[Cab|CaudaSem]):-
+	retira(Cauda,CL,CaudaSem).
+	
+	
+    /* deleta Cliente do BD */
+    deleta :- write ("Deletando um Cliente do B D."), nl,
+              write ("Entre o Codigo: "), readint (Codigo),
+			  emprestimo(Codigo,L), procRR(L),
+              retract (cliente (Codigo,_,_)), procR(Codigo),
+			  retract(emprestimo(Codigo,_)),
+			  write ("Cliente retirado do B D."), nl.
+
+	deleta :- write(" "), nl,
+			  write("Cliente nao encontrado!"), nl.
+	
+	procR(Codigo) :- relatorio(Codigo,_), retract(relatorio(Codigo,_)), procR(Codigo). 		  
+	procR(_) :- nl.		  
+	
+    procRR([]) :- nl.
+	procRR(_)  :- write(" "), nl,
+				  write("Nao excluido! Livros a devolver!"), nl, fail.
+	 
+	 
+	/* deleta livro do BD */ 
+    deletaL :- write("Deletando um Livro."), nl,
+    	       write("Entre com o Codigo: "), nl, readint(Codigo),
+    	       livro(Codigo,Nome,Qte),  Qte >=1 , QteAux = Qte - 1, 
+			   assertz(livro(Codigo,Nome,QteAux)), 
+			   retract(livro(Codigo,Nome,Qte)),  
+    	       write("Livro deletado."), nl.
+    	       
+    deletaL :- write("Livro nao encontrado!!!"), nl.	        
+     
+     
+    /* procura Cliente do BD */
+    procura :- write ("Procurando Cliente no B D."), nl,
+               write ("Entre o Codigo: "), readint (Codigo),
+               cliente (Codigo,Nome,Tel),
+               write ("O Cliente do Codigo ", Codigo, " e'o(a) ",Nome,"."), nl,
+			   write("Tel: ", Tel), nl.
+
+    procura :-  write(" "), nl,
+				write ("Cliente nao encontrado!"), nl.
+
+	/* procura livro do BD */
+    procuraL :- write("Procurando Livro"), nl,
+				write("Entre o Codigo: "), readint(Codigo),
+				livro(Codigo,Nome,Qte),
+				write("Livro do codigo ", Codigo, " 'e o " ,Nome, " Qte:" , Qte), nl.
+     
+    procuraL :- write(" "), nl,
+			    write ("Livro nao encontrado!!!"), nl.  
+     
+	/* Mostra livros que estao alugados */
+	histoC :- write("Digite o codigo do Cliente: "), nl, 
+			  readint(CC), emprestimo(CC,L), write("Livros alugados: "), nl,  
+			  histoA(L). 
+	
+	histoC :- write("Cliente nao alugou livros").  
+	 
+	histoA ([]) :-   nl.
+	histoA ([Cab|Cau]) :- livro(Cab,Nome,_), write("Nome: ", Nome), nl,
+						   histoA(Cau).
+	
+	/* Mostra livros que ja foram lidos pelo cliente */	
+	relatC :- write("Entre codigo do cliente: "), nl, readint(CC), relatorio(CC,_),
+			  findall(CL,relatorio(CC,CL),Lista), write("Livros ja lidos pelo cliente: "), nl, nl, 
+			  analisaR(Lista).
+	
+	relatC :- write("Nao ha registros."), nl.
+	
+	analisaR([]) :- nl.	
+	analisaR([Cab|Cau]) :- livro(Cab,Nome,_), write(Nome), nl,
+						   analisaR(Cau). 		  
+	 
+	/* Mostra clientes que ja leram tal livro */	
+	relatL :- write("Entre codigo do livro: "), nl, readint(CL), relatorio(_,CL),
+			  findall(CC,relatorio(CC,CL),Lista), write("Clientes que ja leram este livro: "), nl, nl, 
+			  analisaRe(Lista).
+	
+	relatL :- write("Nao ha registros"), nl.
+	
+	analisaRe([]) :- nl.	
+	analisaRe([Cab|Cau]) :- cliente(Cab,Nome,_), write(Nome), nl,
+						    analisaRe(Cau).
+	
+    /* salva o arquivo com o banco de dados */
+    salva :- write("Dados Gravados."), nl,
+			 save("BDados").
+
+/* Inicia o programa */
+Goal
+	
+    consult("BDados"), 
+    menuAux(1).
